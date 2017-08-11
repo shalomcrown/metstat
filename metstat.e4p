@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-5.1.dtd">
+<!-- eric5 project file for project metstat -->
+<!-- Saved: 2017-08-11, 15:54:19 -->
+<!-- Copyright (C) 2017 Shalom Crown, shalomcrown@gmail.com -->
+<Project version="5.1">
+  <Language>en_US</Language>
+  <Hash>8f8be1b9a88323acbee23c9ab04f9710fe9c6fe1</Hash>
+  <ProgLanguage mixed="0">Python2</ProgLanguage>
+  <ProjectType>Qt4</ProjectType>
+  <Description></Description>
+  <Version>0.1</Version>
+  <Author>Shalom Crown</Author>
+  <Email>shalomcrown@gmail.com</Email>
+  <Sources>
+    <Source>__init__.py</Source>
+    <Source>com.kirayim.metstat/metstat.py</Source>
+    <Source>com.kirayim.metstat/__init__.py</Source>
+  </Sources>
+  <Forms/>
+  <Translations/>
+  <Resources/>
+  <Interfaces/>
+  <Others>
+    <Other>com.kirayim.metstat/metstat.py</Other>
+  </Others>
+  <MainScript>com.kirayim.metstat/metstat.py</MainScript>
+  <Vcs>
+    <VcsType>None</VcsType>
+  </Vcs>
+  <FiletypeAssociations>
+    <FiletypeAssociation pattern="*.idl" type="INTERFACES"/>
+    <FiletypeAssociation pattern="*.ptl" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.py2" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.pyw2" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.qm" type="TRANSLATIONS"/>
+    <FiletypeAssociation pattern="*.qrc" type="RESOURCES"/>
+    <FiletypeAssociation pattern="*.ts" type="TRANSLATIONS"/>
+    <FiletypeAssociation pattern="*.ui" type="FORMS"/>
+    <FiletypeAssociation pattern="*.ui.h" type="FORMS"/>
+  </FiletypeAssociations>
+</Project>
