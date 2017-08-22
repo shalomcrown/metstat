@@ -48,6 +48,7 @@ class MetApp:
     def __init__(self, master):
         self.cities = {}
         self.token = None
+        master.title('MetStat')
         frame = Frame(master)
         frame.pack()
         Label(frame, text="Location:").grid(row=0, column=1, columnspan=6)
@@ -70,7 +71,7 @@ class MetApp:
         Button(frame, text="Enter token", command=self.enter_token).grid(row=3, column=2)
 
         self.progressBar = ttk.Progressbar(frame, mode='determinate')
-        self.progressBar.grid(row=4, column=0, columnspan=6)
+        self.progressBar.grid(row=4, column=0, columnspan=6, sticky=W+E)
 
         self.load_token()
 
