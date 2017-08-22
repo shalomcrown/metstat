@@ -19,6 +19,7 @@ import httplib
 import os
 import json
 import logging
+import threading
 
 
 class TokenDialog:
@@ -68,6 +69,9 @@ class MetApp:
         Button(frame, text="QUIT", fg="red", command=frame.quit).grid(row=3, column=1)
         Button(frame, text="Enter token", command=self.enter_token).grid(row=3, column=2)
 
+        self.progressBar = ttk.Progressbar(frame, mode='determinate')
+        self.progressBar.grid(row=4, column=0, columnspan=6)
+
         self.load_token()
 
     # =====================================
@@ -114,8 +118,14 @@ class MetApp:
             
             if result['metadata']:
                 totalRecords = result['metadata']['resultset']['count']
-                recordsThisTime = result['metadata']['resultset']['limit']
+                
+                if recordsRemaining is None:
+                    self.progressBar['maximum'] = totalRecords
+                    
+                recordsThisTime =len(result['results'])
                 startRecord = result['metadata']['resultset']['offset'] + recordsThisTime
+                recordsRemaining = totalRecords - startRecord
+                self.progressBar.step(recordsThisTime)
                 
                 for item in result['results']:
                     yield item
@@ -126,11 +136,14 @@ class MetApp:
 
     # ========================================
 
-    def get_cities(self):
+    def get_cities_thread(self):
         for cityData in self.get_all_data('locations?locationcategoryid=CITY&sortfield=name&sortorder=desc'):
             self.cities[cityData['name']] = cityData
-            self.cityCombo['values'] = self.cities.keys()
+            self.cityCombo['values'] = sorted(self.cities.keys())
+        
 
+    def get_cities(self):
+        threading.Thread(target=self.get_cities_thread).start()
 
 
 if __name__ == "__main__":
