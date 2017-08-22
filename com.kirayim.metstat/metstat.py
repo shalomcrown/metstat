@@ -17,6 +17,8 @@ import tkMessageBox
 import ttk
 import httplib
 import os
+import json
+import logging
 
 
 class TokenDialog:
@@ -42,8 +44,9 @@ class MetApp:
         with open(tokenfile) as fl:
             self.token = fl.read().strip()
 
-
     def __init__(self, master):
+        self.cities = {}
+        self.token = None
         frame = Frame(master)
         frame.pack()
         Label(frame, text="Location:").grid(row=0, column=1, columnspan=6)
@@ -80,23 +83,58 @@ class MetApp:
         if parameters is not None:
             pass
 
+
+        logging.debug("GET: " + url)
+
         print "GET: ", url
         connection.request("GET", url, headers={"token" : self.token})
         response = connection.getresponse()
         data = response.read();
+        status = response.status
 
-        print data
+        logging.debug("Response code {}, data:\n{}".format(response, data))
+        return data, status
 
-        return data
+    #--------------------------------------------------------------------------------------------
+
+
+
+    def get_all_data(self, baseUrl, blocksize=100):
+        recordsRemaining = None # unknown for now
+        startRecord = 0
+        
+        while recordsRemaining is None or recordsRemaining > 0:
+            url = "{}&offset={}&limit={}".format(baseUrl, startRecord, blocksize)
+            data, status = self.doGet(url)
+            
+            if status > 299:
+                raise Exception("GET failed")
+            
+            result = json.loads(data)
+            
+            if result['metadata']:
+                totalRecords = result['metadata']['resultset']['count']
+                recordsThisTime = result['metadata']['resultset']['limit']
+                startRecord = result['metadata']['resultset']['offset'] + recordsThisTime
+                
+                for item in result['results']:
+                    yield item
+                
+            else:
+                yield result
+                return
 
     # ========================================
 
     def get_cities(self):
-        self.doGet('locations?locationcategoryid=CITY&sortfield=name&sortorder=desc')
-        pass
+        for cityData in self.get_all_data('locations?locationcategoryid=CITY&sortfield=name&sortorder=desc'):
+            self.cities[cityData['name']] = cityData
+            self.cityCombo['values'] = self.cities.keys()
+
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level = logging.DEBUG, format ='[%(levelname)s] %(asctime)s  %(filename)s(%(lineno)d)  %(funcName)s %(message)s')    
     root = Tk()
     app = MetApp(root)
     root.mainloop()
