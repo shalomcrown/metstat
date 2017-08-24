@@ -83,18 +83,29 @@ class MetApp:
         self.progressBar.grid(row=9, column=0, columnspan=6, sticky=W+E)
 
         self.dbPath = os.path.expanduser('~/.metstat/db')
+        self.readCitiesFromDb()
+
         self.load_token()
 
     # =====================================
 
     def readCitiesFromDb(self):
         conn = sqlite3.connect(self.dbPath)
-        cursor = self.dbConnection.cursor()
+        cursor = conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS CITIES (MINDATE TEXT, MAXDATE TEXT, NAME TEXT, DATACOVERAGE INTEGER, ID TEXT PRIMARY KEY)")
-        
-        
-        
         conn.commit()
+        
+        cursor.execute("SELECT * FROM CITIES")
+        for row in cursor:
+            cityData = {'mindate':row[0], 'maxdate':row[1], 'name':row[2], 'datacoverage':row[3], 'id':row[4]}
+            self.cities[cityData['name']] = cityData
+            
+            if cityData['name'].startswith("Tel Aviv"):
+                self.cityVar.set(cityData['name'])
+
+        self.cityCombo['values'] = sorted(self.cities.keys())
+            
+        
         
 
     #--------------------------------------------------------------------------------------------
@@ -174,6 +185,10 @@ class MetApp:
                            cityData['datacoverage'],
                            cityData['id']
                            ))
+            
+            if cityData['name'].startswith("Tel Aviv"):
+                self.cityVar.set(cityData['name'])
+
         conn.commit()
         conn.close()
         
