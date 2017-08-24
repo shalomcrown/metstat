@@ -20,6 +20,7 @@ import os
 import json
 import logging
 import threading
+import sqlite3
 
 
 class TokenDialog:
@@ -81,9 +82,22 @@ class MetApp:
         self.progressBar = ttk.Progressbar(frame, mode='determinate')
         self.progressBar.grid(row=9, column=0, columnspan=6, sticky=W+E)
 
+        self.dbPath = os.path.expanduser('~/.metstat/db')
         self.load_token()
 
     # =====================================
+
+    def readCitiesFromDb(self):
+        conn = sqlite3.connect(self.dbPath)
+        cursor = self.dbConnection.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS CITIES (MINDATE TEXT, MAXDATE TEXT, NAME TEXT, DATACOVERAGE INTEGER, ID TEXT PRIMARY KEY)")
+        
+        
+        
+        conn.commit()
+        
+
+    #--------------------------------------------------------------------------------------------
 
     def enter_token(self):
         tkMessageBox.showinfo("MetStat", "Use mine for now")
@@ -146,9 +160,22 @@ class MetApp:
     # ========================================
 
     def get_cities_thread(self):
+        conn = sqlite3.connect(self.dbPath)
+        cursor = conn.cursor()
+        #{"mindate":"1927-02-01","maxdate":"2017-08-22","name":"Destin, FL US","datacoverage":1,"id":"CITY:US120011"
+        
         for cityData in self.get_all_data('locations?locationcategoryid=CITY&sortfield=name&sortorder=desc'):
             self.cities[cityData['name']] = cityData
             self.cityCombo['values'] = sorted(self.cities.keys())
+            cursor.execute("INSERT OR REPLACE INTO CITIES VALUES (?, ?, ?, ?, ?)", (
+                           cityData['mindate'],
+                           cityData['maxdate'],
+                           cityData['name'],
+                           cityData['datacoverage'],
+                           cityData['id']
+                           ))
+        conn.commit()
+        conn.close()
         
 
     def get_cities(self):
