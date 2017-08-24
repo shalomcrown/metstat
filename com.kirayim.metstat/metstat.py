@@ -200,14 +200,14 @@ class MetApp:
     #--------------------------------------------------------------------------------------------
 
     def getDataCategoriesThread(self, locationId):
-        for categoryData in self.get_all_data("datasets?datatypeid=TOBS&locationId=" + locationId, blocksize):
-            categoryName = "{} {} {}".format(categoryData['name'], categoryData['mindate'], categoryData['maxDate'])
+        for categoryData in self.get_all_data("datasets?datatypeid=TOBS&locationId=" + locationId):
+            categoryName = "{} {} {}".format(categoryData['name'], categoryData['mindate'], categoryData['maxdate'])
             self.categories[categoryName] = categoryData
             self.categoryCombo['values'] = sorted(self.categories.keys())
 
 
     def getDataCategories(self, locationId):
-        threading.Thread(target=self.getTempDataThread, args=(locationId))
+        threading.Thread(target=self.getDataCategoriesThread, args=(locationId,)).start()
 
     #--------------------------------------------------------------------------------------------
 
@@ -225,4 +225,3 @@ if __name__ == "__main__":
     root = Tk()
     app = MetApp(root)
     root.mainloop()
-    root.destroy()
