@@ -66,7 +66,7 @@ class MetApp:
         self.cityVar = StringVar(master)
         self.cityCombo = ttk.Combobox(master=frame, textvariable=self.cityVar)
         self.cityCombo.grid(row=2, column=2)
-        Button(frame, text="Get cities", command=self.get_cities).grid(row=2, column=3)
+        Button(frame, text="Get cities", command=self.get_cities).grid(row=2, column=3, sticky=W+E)
         
         
         Label(frame, text="Datasets").grid(row=3, column=1)
@@ -74,17 +74,19 @@ class MetApp:
         self.categories = {}
         self.categoryCombo = ttk.Combobox(master=frame, textvariable=self.categoryVar)
         self.categoryCombo.grid(row=3, column=2)
-        Button(frame, text="Get datasets", command=self.get_city_categories).grid(row=3, column=4)
+        Button(frame, text="Get datasets", command=self.get_city_categories).grid(row=3, column=3, sticky=W+E)
+        
+        Button(frame, text="Get data", command=self.get_city_data).grid(row=3, column=4, sticky=W+E)
+        
         
         Button(frame, text="QUIT", fg="red", command=frame.quit).grid(row=8, column=1)
         Button(frame, text="Enter token", command=self.enter_token).grid(row=8, column=2)
 
         self.progressBar = ttk.Progressbar(frame, mode='determinate')
         self.progressBar.grid(row=9, column=0, columnspan=6, sticky=W+E)
-
         self.dbPath = os.path.expanduser('~/.metstat/db')
+        
         self.readCitiesFromDb()
-
         self.load_token()
 
     # =====================================
@@ -106,8 +108,6 @@ class MetApp:
         self.cityCombo['values'] = sorted(self.cities.keys())
             
         
-        
-
     #--------------------------------------------------------------------------------------------
 
     def enter_token(self):
@@ -204,19 +204,34 @@ class MetApp:
             categoryName = "{} {} {}".format(categoryData['name'], categoryData['mindate'], categoryData['maxdate'])
             self.categories[categoryName] = categoryData
             self.categoryCombo['values'] = sorted(self.categories.keys())
+        self.categoryVar.set(self.categories.keys()[0])
 
 
     def getDataCategories(self, locationId):
         threading.Thread(target=self.getDataCategoriesThread, args=(locationId,)).start()
 
-    #--------------------------------------------------------------------------------------------
-
     def get_city_categories(self):
         cityName = self.cityVar.get()
         cityData = self.cities[cityName]
         self.getDataCategories(cityData['id'])
+        
+    #--------------------------------------------------------------------------------------------
+
+    def getDataThread(self, locationId, categoryUID, startDate, endDate):
+        for data in self.get_all_data("data?datasetid={}&locationid={}&startdate={}&enddate={}".format(categoryUID, locationId, startDate, endDate)):
+          print data
 
 
+    def getData(self, locationId, categoryUID, startDate, endDate):
+        threading.Thread(target=self.getDataThread, args=(locationId, categoryUID, startDate, endDate)).start()
+        
+
+    def get_city_data(self):
+        cityName = self.cityVar.get()
+        cityData = self.cities[cityName]        
+        categoryName = self.categoryVar.get()
+        category = self.categories[categoryName]
+        self.getData(cityData['id'], category['uid'], category['mindate'], category['maxdate'])
 
     #--------------------------------------------------------------------------------------------
 
