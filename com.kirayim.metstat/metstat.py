@@ -280,7 +280,7 @@ class MetApp:
         category = self.categories[categoryName]
         fromDate = self.fromDate.getDate()
         toDate = self.toDate.getDate()
-        self.getData(cityData['id'], category['uid'], fromDate.strftime(ISODATESTRING), toDate.strftime(ISODATESTRING))
+        self.getData(cityData['id'], category['id'], fromDate.strftime(ISODATESTRING), toDate.strftime(ISODATESTRING))
 
     #--------------------------------------------------------------------------------------------
 
