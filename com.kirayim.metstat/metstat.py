@@ -21,6 +21,9 @@ import json
 import logging
 import threading
 import sqlite3
+import time
+import calendar
+import datetime
 
 
 class TokenDialog:
@@ -33,6 +36,41 @@ class TokenDialog:
         pass
 
         # =====================================
+
+
+class DateWidget(Frame):
+    def __init__(self, parent, start = datetime.date.today()):
+        Frame.__init__(self, parent)
+        self.yearVar = StringVar(self)
+        self.monthVar = StringVar(self)
+        self.dayVar = StringVar(self)
+        self.cal = calendar.Calendar()
+        now = datetime.date.today()
+        
+        self.yearVar.set(str(start.year))
+        self.monthVar.set(str(start.month))
+        self.dayVar.set(str(start.day))
+        
+        self.yearCombo = ttk.Combobox(master=self, command=self.setMonthDays, textvariable=self.yearVar, values=[str(a) for a in range(1760, now.year)])
+        self.yearCombo.grid(row=0, column=0)
+        
+        self.monthCombo = ttk.Combobox(master=self, command=self.setMonthDays, textvariable=self.yearVar, values=[str(a) for a in range(1, 12)])
+        self.monthCombo.grid(row=0, column=1)
+        
+        self.dayCombo = ttk.Combobox(master=self, textvariable=self.yearVar)
+        self.setmonthDatys()
+        self.dayCombo.grid(row=0, column=2)
+        
+    def setMonthDays(self):
+        values=[str(a) for a in cal.itermonthdays(int(self.yearVar.get()), int(self.monthVar.get()))]
+        self.dayCombo['values'] = values
+        
+        
+        
+    def getDate(self):
+        return datetime.date(int(self.yearVar.get()), int(self.monthVar.get()), int(self.dayVar.get()))
+
+#--------------------------------------------------------------------------------------------
 
 
 class MetApp:
