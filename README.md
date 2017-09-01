@@ -32,3 +32,8 @@ be saved in a database for later
 (Python limit, needs fixing). Choose a year or less 
 * Finally get the data (if it works...)
 * That's all I've developed so far.
+
+
+## License
+* Please feel free to clone, reuse, as long as you attribute me
+* Development help is welcome
