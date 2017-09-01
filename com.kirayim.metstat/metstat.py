@@ -26,6 +26,8 @@ import calendar
 import datetime
 
 
+ISODATESTRING = "%Y-%m-%d"
+
 class TokenDialog:
     def __init__(self, parent):
         top = self.top = Toplevel(parent)
@@ -51,21 +53,21 @@ class DateWidget(Frame):
         self.monthVar.set(str(start.month))
         self.dayVar.set(str(start.day))
         
-        self.yearCombo = ttk.Combobox(master=self, command=self.setMonthDays, textvariable=self.yearVar, values=[str(a) for a in range(1760, now.year)])
-        self.yearCombo.grid(row=0, column=0)
+        self.yearCombo = ttk.Combobox(master=self, textvariable=self.yearVar, values=[str(a) for a in range(1760, now.year)])
+        self.yearCombo.bind("<<ComboboxSelected>>", self.setMonthDays)
+        self.yearCombo.pack(side=LEFT)
         
-        self.monthCombo = ttk.Combobox(master=self, command=self.setMonthDays, textvariable=self.yearVar, values=[str(a) for a in range(1, 12)])
-        self.monthCombo.grid(row=0, column=1)
+        self.monthCombo = ttk.Combobox(master=self, textvariable=self.monthVar, values=[str(a) for a in range(1, 12)])
+        self.monthCombo.bind("<<ComboboxSelected>>", self.setMonthDays)
+        self.monthCombo.pack(side=LEFT)
         
-        self.dayCombo = ttk.Combobox(master=self, textvariable=self.yearVar)
-        self.setmonthDatys()
-        self.dayCombo.grid(row=0, column=2)
+        self.dayCombo = ttk.Combobox(master=self, textvariable=self.dayVar)
+        self.setMonthDays()
+        self.dayCombo.pack(side=LEFT)
         
-    def setMonthDays(self):
-        values=[str(a) for a in cal.itermonthdays(int(self.yearVar.get()), int(self.monthVar.get()))]
+    def setMonthDays(self, what=0):
+        values=[str(a) for a in self.cal.itermonthdays(int(self.yearVar.get()), int(self.monthVar.get())) if a != 0]
         self.dayCombo['values'] = values
-        
-        
         
     def getDate(self):
         return datetime.date(int(self.yearVar.get()), int(self.monthVar.get()), int(self.dayVar.get()))
@@ -103,7 +105,7 @@ class MetApp:
         Label(frame, text="Cities").grid(row=2, column=1)
         self.cityVar = StringVar(master)
         self.cityCombo = ttk.Combobox(master=frame, textvariable=self.cityVar)
-        self.cityCombo.grid(row=2, column=2)
+        self.cityCombo.grid(row=2, column=2, sticky=W+E)
         Button(frame, text="Get cities", command=self.get_cities).grid(row=2, column=3, sticky=W+E)
         
         
@@ -111,17 +113,24 @@ class MetApp:
         self.categoryVar = StringVar(master)
         self.categories = {}
         self.categoryCombo = ttk.Combobox(master=frame, textvariable=self.categoryVar)
-        self.categoryCombo.grid(row=3, column=2)
+        self.categoryCombo.grid(row=3, column=2, sticky=W+E)
         Button(frame, text="Get datasets", command=self.get_city_categories).grid(row=3, column=3, sticky=W+E)
         
         Button(frame, text="Get data", command=self.get_city_data).grid(row=3, column=4, sticky=W+E)
         
+        Label(frame, text="From").grid(row=4, column=1)
+        self.fromDate = DateWidget(frame)
+        self.fromDate.grid(row=4, column=2)
         
-        Button(frame, text="QUIT", fg="red", command=frame.quit).grid(row=8, column=1)
-        Button(frame, text="Enter token", command=self.enter_token).grid(row=8, column=2)
+        Label(frame, text="To").grid(row=5, column=1)
+        self.toDate = DateWidget(frame)
+        self.toDate.grid(row=5, column=2)
+        
+        Button(frame, text="QUIT", fg="red", command=frame.quit).grid(row=11, column=1)
+        Button(frame, text="Enter token", command=self.enter_token).grid(row=11, column=2)
 
         self.progressBar = ttk.Progressbar(frame, mode='determinate')
-        self.progressBar.grid(row=9, column=0, columnspan=6, sticky=W+E)
+        self.progressBar.grid(row=12, column=0, columnspan=6, sticky=W+E)
         self.dbPath = os.path.expanduser('~/.metstat/db')
         
         self.readCitiesFromDb()
@@ -269,7 +278,9 @@ class MetApp:
         cityData = self.cities[cityName]        
         categoryName = self.categoryVar.get()
         category = self.categories[categoryName]
-        self.getData(cityData['id'], category['uid'], category['mindate'], category['maxdate'])
+        fromDate = self.fromDate.getDate()
+        toDate = self.toDate.getDate()
+        self.getData(cityData['id'], category['uid'], fromDate.strftime(ISODATESTRING), toDate.strftime(ISODATESTRING))
 
     #--------------------------------------------------------------------------------------------
 
