@@ -53,7 +53,7 @@ class DateWidget(Frame):
         self.monthVar.set(str(start.month))
         self.dayVar.set(str(start.day))
         
-        self.yearCombo = ttk.Combobox(master=self, textvariable=self.yearVar, values=[str(a) for a in range(1760, now.year)])
+        self.yearCombo = ttk.Combobox(master=self, textvariable=self.yearVar, values=[str(a) for a in range(1900, now.year)])
         self.yearCombo.bind("<<ComboboxSelected>>", self.setMonthDays)
         self.yearCombo.pack(side=LEFT)
         
