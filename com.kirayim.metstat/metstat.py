@@ -142,6 +142,7 @@ class MetApp:
         conn = sqlite3.connect(self.dbPath)
         cursor = conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS CITIES (MINDATE TEXT, MAXDATE TEXT, NAME TEXT, DATACOVERAGE INTEGER, ID TEXT PRIMARY KEY)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS DAILY_SUMMARY (DATE TEXT, STATION TEXT, PRCP INTEGER, TMAX INTEGER, TMIN INTEGER, TAVG INTEGER, PRIMARY KEY (STATION, DATE) )")
         conn.commit()
         
         cursor.execute("SELECT * FROM CITIES")
@@ -266,12 +267,45 @@ class MetApp:
 
     def getDataThread(self, locationId, categoryUID, startDate, endDate):
         for data in self.get_all_data("data?datasetid={}&locationid={}&startdate={}&enddate={}".format(categoryUID, locationId, startDate, endDate)):
-          print data
+            
+            print data
 
 
     def getData(self, locationId, categoryUID, startDate, endDate):
         threading.Thread(target=self.getDataThread, args=(locationId, categoryUID, startDate, endDate)).start()
         
+
+        
+        eaxmpleData= [{
+                        "date": "2015-09-01T00:00:00",
+                        "datatype": "PRCP",
+                        "station": "GHCND:ISE00105694",
+                        "attributes": ",,S,",
+                        "value": 0
+                    },
+                    {
+                        "date": "2015-09-01T00:00:00",
+                        "datatype": "TAVG",
+                        "station": "GHCND:ISE00105694",
+                        "attributes": "H,,S,",
+                        "value": 286
+                    },
+                    {
+                        "date": "2015-09-01T00:00:00",
+                        "datatype": "TMAX",
+                        "station": "GHCND:ISE00105694",
+                        "attributes": ",,E,",
+                        "value": 331
+                    },
+                    {
+                        "date": "2015-09-01T00:00:00",
+                        "datatype": "TMIN",
+                        "station": "GHCND:ISE00105694",
+                        "attributes": ",,E,",
+                        "value": 246
+                    }]
+        
+
 
     def get_city_data(self):
         cityName = self.cityVar.get()

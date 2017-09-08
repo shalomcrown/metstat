@@ -27,6 +27,8 @@ for met stations
 
 * The first time you use it, download the list of cities. This will 
 be saved in a database for later
+* Tel Aviv will be chosen as default. This is actually Beth Dagan
+Met station ISE00105694, situated outside the city.
 * Next, get the data types for the city you want.
 * Now choose a range of dates. Doesn't support dates before 1900
 (Python limit, needs fixing). Choose a year or less 
